@@ -17,4 +17,7 @@ if [ ! -f "lib/.env" ]; then
 fi
 
 echo "Starting To Do server at http://${HOST}:${PORT}/"
-exec php -S "${HOST}:${PORT}" -t web
+exec php \
+    -d upload_max_filesize=20M \
+    -d post_max_size=25M \
+    -S "${HOST}:${PORT}" -t web

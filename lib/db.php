@@ -50,14 +50,27 @@ function get_db(): PDO
             task_id INTEGER NOT NULL,
             note TEXT NOT NULL,
             minutes INTEGER,
+            attachment_path TEXT,
+            attachment_name TEXT,
+            attachment_size INTEGER,
+            attachment_mime TEXT,
             created_at TEXT NOT NULL DEFAULT (datetime(\'now\', \'localtime\'))
         )
     ');
 
-    // Migrate older databases created before minutes existed.
+    // Migrate older databases created before minutes/attachments existed.
     $existingNoteColumns = array_column($pdo->query('PRAGMA table_info(task_notes)')->fetchAll(PDO::FETCH_ASSOC), 'name');
-    if (!in_array('minutes', $existingNoteColumns, true)) {
-        $pdo->exec('ALTER TABLE task_notes ADD COLUMN minutes INTEGER');
+    $noteMigrations = [
+        'minutes' => 'ALTER TABLE task_notes ADD COLUMN minutes INTEGER',
+        'attachment_path' => 'ALTER TABLE task_notes ADD COLUMN attachment_path TEXT',
+        'attachment_name' => 'ALTER TABLE task_notes ADD COLUMN attachment_name TEXT',
+        'attachment_size' => 'ALTER TABLE task_notes ADD COLUMN attachment_size INTEGER',
+        'attachment_mime' => 'ALTER TABLE task_notes ADD COLUMN attachment_mime TEXT',
+    ];
+    foreach ($noteMigrations as $column => $sql) {
+        if (!in_array($column, $existingNoteColumns, true)) {
+            $pdo->exec($sql);
+        }
     }
 
     $pdo->exec('

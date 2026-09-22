@@ -164,6 +164,12 @@ function compute_next_due(string $dueAt, string $recurrence): string
 
 function delete_task(int $id): void
 {
+    foreach (get_task_notes($id) as $note) {
+        if (!empty($note['attachment_path'])) {
+            delete_attachment_file((string) $note['attachment_path']);
+        }
+    }
+
     get_db()->prepare('DELETE FROM task_notes WHERE task_id = :id')->execute(['id' => $id]);
     get_db()->prepare('DELETE FROM task_chats WHERE task_id = :id')->execute(['id' => $id]);
     get_db()->prepare('DELETE FROM tasks WHERE id = :id')->execute(['id' => $id]);
@@ -185,12 +191,13 @@ function get_chat_messages(int $taskId): array
 }
 
 const TIME_INCREMENTS = [15, 30, 45, 60];
+const MAX_ATTACHMENT_BYTES = 15 * 1024 * 1024; // 15MB, under PHP's upload_max_filesize/post_max_size
 
-function add_note(int $taskId, string $note, ?int $minutes = null): void
+function add_note(int $taskId, string $note, ?int $minutes = null): ?int
 {
     $note = trim($note);
     if ($note === '' || get_task($taskId) === null) {
-        return;
+        return null;
     }
 
     if (!in_array($minutes, TIME_INCREMENTS, true)) {
@@ -199,6 +206,67 @@ function add_note(int $taskId, string $note, ?int $minutes = null): void
 
     $stmt = get_db()->prepare('INSERT INTO task_notes (task_id, note, minutes) VALUES (:task_id, :note, :minutes)');
     $stmt->execute(['task_id' => $taskId, 'note' => $note, 'minutes' => $minutes]);
+
+    return (int) get_db()->lastInsertId();
+}
+
+// $file is one entry from $_FILES. Silently skips on any problem (missing
+// file, too large, upload error) so the note text itself is never lost.
+function attach_file_to_note(int $noteId, array $file): void
+{
+    if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+        return;
+    }
+    if (!is_uploaded_file($file['tmp_name']) || (int) $file['size'] > MAX_ATTACHMENT_BYTES) {
+        return;
+    }
+
+    $config = require __DIR__ . '/config.php';
+    $uploadDir = $config['uploads_dir'];
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0770, true);
+    }
+
+    $originalName = basename((string) $file['name']);
+    $extension = preg_replace('/[^a-zA-Z0-9]/', '', pathinfo($originalName, PATHINFO_EXTENSION));
+    $storedName = bin2hex(random_bytes(16)) . ($extension !== '' ? ".{$extension}" : '');
+    $destination = $uploadDir . '/' . $storedName;
+
+    if (!move_uploaded_file($file['tmp_name'], $destination)) {
+        return;
+    }
+
+    $mime = @mime_content_type($destination) ?: 'application/octet-stream';
+
+    $stmt = get_db()->prepare(
+        'UPDATE task_notes
+         SET attachment_path = :path, attachment_name = :name, attachment_size = :size, attachment_mime = :mime
+         WHERE id = :id'
+    );
+    $stmt->execute([
+        'path' => $storedName,
+        'name' => $originalName,
+        'size' => (int) $file['size'],
+        'mime' => $mime,
+        'id' => $noteId,
+    ]);
+}
+
+function delete_attachment_file(string $storedName): void
+{
+    $config = require __DIR__ . '/config.php';
+    $path = $config['uploads_dir'] . '/' . $storedName;
+    if (is_file($path)) {
+        @unlink($path);
+    }
+}
+
+function get_note(int $id): ?array
+{
+    $stmt = get_db()->prepare('SELECT * FROM task_notes WHERE id = :id');
+    $stmt->execute(['id' => $id]);
+    $note = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $note === false ? null : $note;
 }
 
 function get_task_notes(int $taskId): array
@@ -206,6 +274,17 @@ function get_task_notes(int $taskId): array
     $stmt = get_db()->prepare('SELECT * FROM task_notes WHERE task_id = :task_id ORDER BY created_at DESC');
     $stmt->execute(['task_id' => $taskId]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function format_bytes(int $bytes): string
+{
+    if ($bytes >= 1048576) {
+        return round($bytes / 1048576, 1) . ' MB';
+    }
+    if ($bytes >= 1024) {
+        return round($bytes / 1024) . ' KB';
+    }
+    return $bytes . ' B';
 }
 
 function format_datetime(string $dateTime): string

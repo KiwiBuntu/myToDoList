@@ -471,6 +471,22 @@ h1 {
     word-wrap: break-word;
 }
 
+.note-attachment {
+    display: inline-block;
+    margin-top: 0.4rem;
+    font-size: 0.78rem;
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.note-attachment:hover {
+    text-decoration: underline;
+}
+
+.note-attachment-size {
+    color: var(--muted);
+}
+
 .note-form {
     display: flex;
     flex-direction: column;
@@ -492,6 +508,11 @@ h1 {
 .note-form textarea {
     resize: vertical;
     min-height: 4.5rem;
+}
+
+.note-form input[type="file"] {
+    font-size: 0.8rem;
+    color: var(--muted);
 }
 
 .note-form button {

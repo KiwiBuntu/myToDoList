@@ -14,6 +14,7 @@ date_default_timezone_set($systemTimezone !== '' ? $systemTimezone : 'UTC');
 
 return [
     'db_path' => __DIR__ . '/data/todo.sqlite',
+    'uploads_dir' => __DIR__ . '/data/uploads',
     'gemini_api_key' => getenv('GEMINI_API_KEY') ?: '',
     'gemini_model' => 'gemini-flash-latest',
 ];

@@ -23,7 +23,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($action === 'add_note') {
         $taskId = (int) ($_POST['task_id'] ?? 0);
         $minutes = $_POST['minutes'] ?? '';
-        add_note($taskId, (string) ($_POST['note'] ?? ''), $minutes === '' ? null : (int) $minutes);
+        $noteId = add_note($taskId, (string) ($_POST['note'] ?? ''), $minutes === '' ? null : (int) $minutes);
+        if ($noteId !== null && isset($_FILES['attachment'])) {
+            attach_file_to_note($noteId, $_FILES['attachment']);
+        }
     }
 
     $params = [];
@@ -275,11 +278,17 @@ $todayCount = count($reminders) - $overdueCount;
                                     <?php endif; ?>
                                 </time>
                                 <p><?= nl2br(htmlspecialchars($note['note'])) ?></p>
+                                <?php if ($note['attachment_path']): ?>
+                                    <a class="note-attachment" href="attachment.php?note_id=<?= (int) $note['id'] ?>" target="_blank" rel="noopener">
+                                        📎 <?= htmlspecialchars((string) $note['attachment_name']) ?>
+                                        <span class="note-attachment-size">(<?= htmlspecialchars(format_bytes((int) $note['attachment_size'])) ?>)</span>
+                                    </a>
+                                <?php endif; ?>
                             </div>
                         <?php endforeach; ?>
                     </div>
 
-                    <form method="post" class="note-form" action="<?= htmlspecialchars($actionUrl) ?>">
+                    <form method="post" class="note-form" action="<?= htmlspecialchars($actionUrl) ?>" enctype="multipart/form-data">
                         <input type="hidden" name="action" value="add_note">
                         <input type="hidden" name="task_id" value="<?= (int) $task['id'] ?>">
                         <textarea name="note" placeholder="Add a note..." required></textarea>
@@ -290,6 +299,7 @@ $todayCount = count($reminders) - $overdueCount;
                             <option value="45">45 min</option>
                             <option value="60">1 hour</option>
                         </select>
+                        <input type="file" name="attachment">
                         <button type="submit">Add note</button>
                     </form>
                 </dialog>
