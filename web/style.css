@@ -1,0 +1,575 @@
+:root {
+    --bg: #f7f6f3;
+    --card: #ffffff;
+    --ink: #2b2b28;
+    --muted: #8a8578;
+    --line: #e7e3da;
+    --accent: #3f6b52;
+    --work: #4a5fa5;
+    --personal: #a5794a;
+    --danger: #b5504a;
+    --urgent: #b5504a;
+    --relaxed: #4a8f6b;
+    --today: #b5822a;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--bg);
+    color: var(--ink);
+    margin: 0;
+    padding: 2.5rem 1rem;
+    line-height: 1.4;
+}
+
+main {
+    max-width: 560px;
+    margin: 0 auto;
+}
+
+h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0 0 1.25rem;
+}
+
+.add-form {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 0.9rem;
+    margin-bottom: 1.25rem;
+}
+
+.add-form input[type="text"] {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0.55rem 0.7rem;
+    font-size: 0.95rem;
+    font-family: inherit;
+}
+
+.add-form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.55rem;
+}
+
+.add-form-row select,
+.add-form-row input[type="text"],
+.add-form-row input[type="datetime-local"] {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0.5rem 0.6rem;
+    font-size: 0.9rem;
+    font-family: inherit;
+    background: var(--card);
+    color: var(--ink);
+}
+
+.add-form-row #client,
+.add-form-row #due_at,
+.add-form-row #recurrence {
+    flex: 1;
+    min-width: 9rem;
+}
+
+.add-form-row .hidden {
+    display: none;
+}
+
+.add-form-submit {
+    justify-content: flex-end;
+}
+
+.add-form-row button {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem 1.25rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.add-form-row button:hover {
+    opacity: 0.9;
+}
+
+.filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.85rem;
+}
+
+.filters a {
+    color: var(--muted);
+    text-decoration: none;
+}
+
+.filters a.active {
+    color: var(--ink);
+    font-weight: 600;
+    border-bottom: 2px solid var(--accent);
+}
+
+.tag-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+}
+
+.chip {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: lowercase;
+    text-decoration: none;
+    color: var(--muted);
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.2rem 0.6rem;
+    white-space: nowrap;
+}
+
+.chip:hover {
+    border-color: var(--accent);
+    color: var(--ink);
+}
+
+.chip.active {
+    color: #fff;
+    border-color: transparent;
+}
+
+.chip-personal.active {
+    background: var(--personal);
+}
+
+.chip-work.active {
+    background: var(--work);
+}
+
+.chip-priority-urgent.active {
+    background: var(--urgent);
+}
+
+.chip-priority-relaxed.active {
+    background: var(--relaxed);
+}
+
+.chip-client.active {
+    background: var(--muted);
+}
+
+.chip-clear {
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-decoration: none;
+}
+
+.chip-clear:hover {
+    color: var(--danger);
+}
+
+.task-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.task {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 0.7rem 0.8rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+}
+
+.task.done .description {
+    text-decoration: line-through;
+    color: var(--muted);
+}
+
+.task.done {
+    opacity: 0.7;
+}
+
+.empty {
+    color: var(--muted);
+    text-align: center;
+    padding: 1.5rem 0;
+    font-size: 0.9rem;
+    list-style: none;
+}
+
+.toggle-form {
+    margin: 0;
+}
+
+.checkbox {
+    width: 1.3rem;
+    height: 1.3rem;
+    border-radius: 50%;
+    border: 1.5px solid var(--muted);
+    background: transparent;
+    color: var(--accent);
+    font-size: 0.75rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+}
+
+.task-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.description {
+    display: block;
+    font-size: 0.95rem;
+    word-wrap: break-word;
+}
+
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.35rem;
+}
+
+.tag {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 0.15rem 0.45rem;
+    border-radius: 999px;
+    color: #fff;
+}
+
+.tag-work {
+    background: var(--work);
+}
+
+.tag-personal {
+    background: var(--personal);
+}
+
+.tag-client {
+    background: var(--muted);
+    text-transform: none;
+}
+
+.tag-priority-urgent {
+    background: var(--urgent);
+}
+
+.tag-priority-relaxed {
+    background: var(--relaxed);
+}
+
+.tag-due {
+    background: var(--muted);
+    text-transform: none;
+}
+
+.tag-due-today {
+    background: var(--today);
+}
+
+.tag-due-overdue {
+    background: var(--danger);
+}
+
+.last-activity {
+    margin-top: 0.35rem;
+    font-size: 0.7rem;
+    color: var(--muted);
+}
+
+.task-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.4rem;
+    flex-shrink: 0;
+}
+
+.help-btn,
+.notes-btn {
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    color: var(--muted);
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.help-btn:hover,
+.notes-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.notes-dialog,
+.help-dialog {
+    border: none;
+    border-radius: 12px;
+    padding: 1rem 1.1rem 1.1rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.notes-dialog {
+    width: 420px;
+    max-width: 90vw;
+    max-height: 80vh;
+}
+
+.help-dialog {
+    width: min(720px, 92vw);
+    height: min(680px, 88vh);
+}
+
+/* Scoped to [open] so this doesn't override the browser's default
+   "dialog:not([open]) { display: none }" and force every dialog visible. */
+.help-dialog[open] {
+    display: flex;
+    flex-direction: column;
+}
+
+.notes-dialog::backdrop,
+.help-dialog::backdrop {
+    background: rgba(20, 18, 14, 0.4);
+}
+
+.notes-dialog h2,
+.help-dialog h2 {
+    font-size: 1.05rem;
+    margin: 0.2rem 1.5rem 0.1rem 0;
+}
+
+.dialog-close-form {
+    display: flex;
+    justify-content: flex-end;
+    margin: -0.5rem -0.4rem -1.6rem 0;
+}
+
+.dialog-close {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 1.3rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0.2rem 0.4rem;
+}
+
+.dialog-close:hover {
+    color: var(--danger);
+}
+
+.notes-list {
+    margin-top: 0.75rem;
+    max-height: 40vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.notes-list .empty {
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin: 0.5rem 0;
+}
+
+.note {
+    background: #f2f0ea;
+    border-radius: 8px;
+    padding: 0.5rem 0.65rem;
+}
+
+.note time {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-bottom: 0.2rem;
+}
+
+.note p {
+    margin: 0;
+    font-size: 0.88rem;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.note-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.9rem;
+}
+
+.note-form textarea,
+.note-form select {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0.55rem 0.65rem;
+    font-size: 0.9rem;
+    font-family: inherit;
+    background: var(--card);
+    color: var(--ink);
+}
+
+.note-form textarea {
+    resize: vertical;
+    min-height: 4.5rem;
+}
+
+.note-form button {
+    align-self: flex-end;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem 1.1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.note-form button:hover {
+    opacity: 0.9;
+}
+
+.delete-form {
+    margin: 0;
+}
+
+.delete-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0.1rem 0.3rem;
+}
+
+.delete-btn:hover {
+    color: var(--danger);
+}
+
+.chat-log {
+    margin-top: 0.75rem;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.chat-message {
+    border-radius: 8px;
+    padding: 0.5rem 0.65rem;
+    max-width: 90%;
+}
+
+.chat-message time {
+    display: block;
+    font-size: 0.68rem;
+    color: var(--muted);
+    margin-bottom: 0.2rem;
+}
+
+.chat-message p {
+    margin: 0;
+    font-size: 0.88rem;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.chat-user {
+    align-self: flex-end;
+    background: var(--accent);
+    color: #fff;
+}
+
+.chat-user time {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.chat-model {
+    align-self: flex-start;
+    background: #f2f0ea;
+    color: var(--ink);
+}
+
+.chat-model.thinking p {
+    color: var(--muted);
+    font-style: italic;
+}
+
+.chat-model.chat-error {
+    background: #f7e6e4;
+    color: var(--danger);
+}
+
+.chat-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.9rem;
+    flex-shrink: 0;
+}
+
+.chat-form textarea {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0.55rem 0.65rem;
+    font-size: 0.9rem;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 4.5rem;
+}
+
+.chat-form button {
+    align-self: flex-end;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem 1.1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.chat-form button:hover {
+    opacity: 0.9;
+}
