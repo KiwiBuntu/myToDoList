@@ -251,3 +251,17 @@ function due_status(string $dueAt): string
     }
     return 'upcoming';
 }
+
+// Open tasks that are overdue or due today, soonest first — for the reminder banner.
+function get_due_reminders(): array
+{
+    $stmt = get_db()->query(
+        "SELECT * FROM tasks WHERE done = 0 AND due_at IS NOT NULL ORDER BY due_at ASC"
+    );
+    $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    return array_values(array_filter(
+        $tasks,
+        fn (array $task) => due_status((string) $task['due_at']) !== 'upcoming'
+    ));
+}

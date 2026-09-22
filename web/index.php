@@ -83,6 +83,9 @@ function state_url(string $filter, array $categories, array $priorities, array $
 }
 
 $actionUrl = state_url($filter, $selectedCategories, $selectedPriorities, $selectedClients);
+$reminders = get_due_reminders();
+$overdueCount = count(array_filter($reminders, fn (array $t) => due_status((string) $t['due_at']) === 'overdue'));
+$todayCount = count($reminders) - $overdueCount;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -95,6 +98,29 @@ $actionUrl = state_url($filter, $selectedCategories, $selectedPriorities, $selec
 <body>
 <main>
     <h1>To Do</h1>
+
+    <?php if ($reminders): ?>
+        <div class="reminder-banner">
+            <strong>
+                <?php if ($overdueCount > 0): ?>
+                    ⏰ <?= $overdueCount ?> overdue<?= $todayCount > 0 ? ', ' . $todayCount . ' due today' : '' ?>
+                <?php else: ?>
+                    ⏰ <?= $todayCount ?> due today
+                <?php endif; ?>
+            </strong>
+            <ul>
+                <?php foreach ($reminders as $reminder): ?>
+                    <li>
+                        <a href="index.php?filter=open#task-<?= (int) $reminder['id'] ?>"><?= htmlspecialchars($reminder['description']) ?></a>
+                        &middot;
+                        <span class="reminder-status reminder-<?= due_status((string) $reminder['due_at']) ?>">
+                            <?= htmlspecialchars(format_due((string) $reminder['due_at'])) ?>
+                        </span>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+    <?php endif; ?>
 
     <form class="add-form" method="post" action="<?= htmlspecialchars($actionUrl) ?>">
         <input type="hidden" name="action" value="add">
@@ -179,7 +205,7 @@ $actionUrl = state_url($filter, $selectedCategories, $selectedPriorities, $selec
         <?php endif; ?>
 
         <?php foreach ($tasks as $task): ?>
-            <li class="task <?= $task['done'] ? 'done' : '' ?>">
+            <li id="task-<?= (int) $task['id'] ?>" class="task <?= $task['done'] ? 'done' : '' ?>">
                 <form method="post" class="toggle-form" action="<?= htmlspecialchars($actionUrl) ?>">
                     <input type="hidden" name="action" value="toggle">
                     <input type="hidden" name="id" value="<?= (int) $task['id'] ?>">
