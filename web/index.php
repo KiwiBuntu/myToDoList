@@ -312,10 +312,14 @@ $todayCount = count($reminders) - $overdueCount;
 
                     <?php $chatMessages = get_chat_messages((int) $task['id']); ?>
                     <div class="chat-log" id="chat-log-<?= (int) $task['id'] ?>">
-                        <?php foreach ($chatMessages as $message): ?>
-                            <div class="chat-message chat-<?= htmlspecialchars($message['role']) ?>">
+                        <?php foreach ($chatMessages as $i => $message): ?>
+                            <?php $collapsed = $message['role'] === 'model' && $i !== count($chatMessages) - 1; ?>
+                            <div class="chat-message chat-<?= htmlspecialchars($message['role']) ?> <?= $collapsed ? 'collapsed' : '' ?>">
                                 <time><?= htmlspecialchars(format_datetime((string) $message['created_at'])) ?></time>
                                 <p><?= nl2br(htmlspecialchars($message['content'])) ?></p>
+                                <?php if ($message['role'] === 'model'): ?>
+                                    <button type="button" class="chat-toggle"><?= $collapsed ? 'Show more' : 'Show less' ?></button>
+                                <?php endif; ?>
                             </div>
                         <?php endforeach; ?>
                     </div>

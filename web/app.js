@@ -33,6 +33,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function openDialog(dialog) {
         dialog.showModal();
+        var log = dialog.querySelector('.chat-log');
+        if (log) {
+            log.scrollTop = log.scrollHeight;
+        }
         var textarea = dialog.querySelector('textarea');
         if (textarea) {
             textarea.focus();
@@ -69,6 +73,15 @@ document.addEventListener('DOMContentLoaded', function () {
         window.history.replaceState({}, '', url);
     }
 
+    document.addEventListener('click', function (event) {
+        if (!event.target.classList.contains('chat-toggle')) {
+            return;
+        }
+        var bubble = event.target.closest('.chat-message');
+        var collapsed = bubble.classList.toggle('collapsed');
+        event.target.textContent = collapsed ? 'Show more' : 'Show less';
+    });
+
     function appendChatMessage(log, role, content, time, extraClass) {
         var div = document.createElement('div');
         div.className = 'chat-message chat-' + role + (extraClass ? ' ' + extraClass : '');
@@ -78,9 +91,29 @@ document.addEventListener('DOMContentLoaded', function () {
         p.textContent = content;
         div.appendChild(timeEl);
         div.appendChild(p);
+        if (role === 'model') {
+            var toggle = document.createElement('button');
+            toggle.type = 'button';
+            toggle.className = 'chat-toggle';
+            toggle.textContent = 'Show less';
+            div.appendChild(toggle);
+        }
         log.appendChild(div);
         log.scrollTop = log.scrollHeight;
         return div;
+    }
+
+    function collapsePreviousReply(log) {
+        var modelBubbles = log.querySelectorAll('.chat-model');
+        var previous = modelBubbles[modelBubbles.length - 1];
+        if (!previous) {
+            return;
+        }
+        previous.classList.add('collapsed');
+        var toggle = previous.querySelector('.chat-toggle');
+        if (toggle) {
+            toggle.textContent = 'Show more';
+        }
     }
 
     document.querySelectorAll('.chat-form').forEach(function (form) {
@@ -96,6 +129,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             var log = document.getElementById('chat-log-' + taskId);
+            collapsePreviousReply(log);
             var userBubble = appendChatMessage(log, 'user', message, 'Just now');
             textarea.value = '';
             textarea.placeholder = 'Reply...';

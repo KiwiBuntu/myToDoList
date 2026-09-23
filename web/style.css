@@ -605,6 +605,26 @@ h1 {
     color: var(--danger);
 }
 
+.chat-model.collapsed p {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.chat-toggle {
+    display: block;
+    margin-top: 0.3rem;
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+}
+
 .chat-form {
     display: flex;
     flex-direction: column;
