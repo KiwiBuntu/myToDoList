@@ -234,7 +234,7 @@ $todayCount = count($reminders) - $overdueCount;
                 </div>
 
                 <div class="task-actions">
-                    <?php $chatCount = count(get_chat_messages((int) $task['id'])); ?>
+                    <?php $chatCount = count(array_filter(get_chat_messages((int) $task['id']), fn ($m) => $m['role'] === 'user')); ?>
                     <button type="button" class="help-btn" data-dialog="help-dialog-<?= (int) $task['id'] ?>">
                         Get help with this<?= $chatCount > 0 ? ' (' . $chatCount . ')' : '' ?>
                     </button>
