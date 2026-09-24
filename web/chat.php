@@ -39,5 +39,8 @@ $replyEntry = $updated[count($updated) - 1];
 
 echo json_encode([
     'user' => ['content' => $userEntry['content'], 'time' => format_datetime((string) $userEntry['created_at'])],
-    'reply' => ['content' => $replyEntry['content'], 'time' => format_datetime((string) $replyEntry['created_at'])],
+    'reply' => [
+        'html' => format_chat_markdown($replyEntry['content']),
+        'time' => format_datetime((string) $replyEntry['created_at']),
+    ],
 ]);

@@ -315,7 +315,13 @@ $todayCount = count($reminders) - $overdueCount;
                             <?php $collapsed = $message['role'] === 'model' && $i !== count($chatMessages) - 1; ?>
                             <div class="chat-message chat-<?= htmlspecialchars($message['role']) ?> <?= $collapsed ? 'collapsed' : '' ?>">
                                 <time><?= htmlspecialchars(format_datetime((string) $message['created_at'])) ?></time>
-                                <p><?= nl2br(htmlspecialchars($message['content'])) ?></p>
+                                <div class="chat-text">
+                                    <?php if ($message['role'] === 'model'): ?>
+                                        <?= format_chat_markdown($message['content']) ?>
+                                    <?php else: ?>
+                                        <?= nl2br(htmlspecialchars($message['content'])) ?>
+                                    <?php endif; ?>
+                                </div>
                                 <?php if ($message['role'] === 'model'): ?>
                                     <button type="button" class="chat-toggle"><?= $collapsed ? 'Show more' : 'Show less' ?></button>
                                 <?php endif; ?>

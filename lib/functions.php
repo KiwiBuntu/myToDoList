@@ -292,6 +292,107 @@ function format_datetime(string $dateTime): string
     return (new DateTime($dateTime))->format('j M, g:ia');
 }
 
+// Renders a practical subset of Markdown (headings, bold/italic, inline and
+// fenced code, links, bullet/numbered lists, blockquotes, paragraphs) from an
+// AI reply into safe HTML. Escapes first, then only ever inserts our own
+// fixed tags around already-escaped text — never trusts the model's output
+// to already be safe HTML.
+function format_chat_markdown(string $content): string
+{
+    // Pull out fenced code blocks before anything else touches the text, so
+    // their contents are escaped but never reinterpreted as markdown.
+    $codeBlocks = [];
+    $content = preg_replace_callback(
+        '/```[a-zA-Z0-9]*\n?(.*?)```/s',
+        function (array $match) use (&$codeBlocks) {
+            $codeBlocks[] = '<pre><code>' . htmlspecialchars(trim($match[1], "\n"), ENT_QUOTES, 'UTF-8') . '</code></pre>';
+            return "\x01CODEBLOCK" . (count($codeBlocks) - 1) . "\x01";
+        },
+        $content
+    );
+
+    $escaped = htmlspecialchars($content, ENT_QUOTES, 'UTF-8');
+    $escaped = preg_replace('/`([^`\n]+)`/', '<code>$1</code>', $escaped);
+    $escaped = preg_replace('/\*\*(.+?)\*\*/s', '<strong>$1</strong>', $escaped);
+    $escaped = preg_replace('/(?<!\*)\*([^*\n]+)\*(?!\*)/', '<em>$1</em>', $escaped);
+    $escaped = preg_replace(
+        '/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/',
+        '<a href="$2" target="_blank" rel="noopener">$1</a>',
+        $escaped
+    );
+
+    $html = '';
+    $paragraph = [];
+    $listType = null;
+    $listItems = [];
+
+    $flushParagraph = function () use (&$paragraph, &$html) {
+        if ($paragraph) {
+            $html .= '<p>' . implode('<br>', $paragraph) . '</p>';
+            $paragraph = [];
+        }
+    };
+    $flushList = function () use (&$listType, &$listItems, &$html) {
+        if ($listType === 'ul') {
+            $html .= '<ul>' . implode('', array_map(fn ($item) => "<li>{$item}</li>", $listItems)) . '</ul>';
+        } elseif ($listType === 'ol') {
+            $html .= '<ol>' . implode('', array_map(fn ($item) => "<li>{$item}</li>", $listItems)) . '</ol>';
+        } elseif ($listType === 'blockquote') {
+            $html .= '<blockquote>' . implode('<br>', $listItems) . '</blockquote>';
+        }
+        $listType = null;
+        $listItems = [];
+    };
+
+    foreach (explode("\n", $escaped) as $line) {
+        $line = trim($line);
+
+        if ($line === '') {
+            $flushList();
+            $flushParagraph();
+        } elseif (preg_match('/^\x01CODEBLOCK(\d+)\x01$/', $line, $m)) {
+            $flushList();
+            $flushParagraph();
+            $html .= $codeBlocks[(int) $m[1]];
+        } elseif (preg_match('/^#{1,6}\s+(.*)/', $line, $m)) {
+            $flushList();
+            $flushParagraph();
+            $html .= '<p><strong>' . $m[1] . '</strong></p>';
+        } elseif (preg_match('/^(-{3,}|\*{3,}|_{3,})$/', $line)) {
+            $flushList();
+            $flushParagraph();
+        } elseif (preg_match('/^[-*]\s+(.*)/', $line, $m)) {
+            $flushParagraph();
+            if ($listType !== 'ul') {
+                $flushList();
+                $listType = 'ul';
+            }
+            $listItems[] = $m[1];
+        } elseif (preg_match('/^\d+\.\s+(.*)/', $line, $m)) {
+            $flushParagraph();
+            if ($listType !== 'ol') {
+                $flushList();
+                $listType = 'ol';
+            }
+            $listItems[] = $m[1];
+        } elseif (preg_match('/^&gt;\s?(.*)/', $line, $m)) {
+            $flushParagraph();
+            if ($listType !== 'blockquote') {
+                $flushList();
+                $listType = 'blockquote';
+            }
+            $listItems[] = $m[1];
+        } else {
+            $flushList();
+            $paragraph[] = $line;
+        }
+    }
+    $flushList();
+    $flushParagraph();
+
+    return $html;
+}
+
 function format_minutes(int $minutes): string
 {
     $hours = intdiv($minutes, 60);

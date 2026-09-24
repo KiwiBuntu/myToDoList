@@ -36,7 +36,17 @@ function get_gemini_reply(array $history): string
         $history
     );
 
-    $payload = json_encode(['contents' => $contents]);
+    $payload = json_encode([
+        'systemInstruction' => [
+            'parts' => [['text' =>
+                'Replies are shown as plain formatted text in a small chat popup, not rendered math or a full '
+                . 'markdown document. Do not use LaTeX or math notation (e.g. $\\rightarrow$, \\frac{}{}) — write '
+                . 'things out in plain words or simple symbols like -> instead. Basic markdown is fine: **bold**, '
+                . '`code`, and - bullet or 1. numbered lists.'
+            ]],
+        ],
+        'contents' => $contents,
+    ]);
 
     $ch = curl_init($url);
     curl_setopt_array($ch, [

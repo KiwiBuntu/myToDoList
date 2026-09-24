@@ -71,10 +71,11 @@ document.addEventListener('DOMContentLoaded', function () {
         div.className = 'chat-message chat-' + role + (extraClass ? ' ' + extraClass : '');
         var timeEl = document.createElement('time');
         timeEl.textContent = time;
-        var p = document.createElement('p');
-        p.textContent = content;
+        var textEl = document.createElement('div');
+        textEl.className = 'chat-text';
+        textEl.textContent = content;
         div.appendChild(timeEl);
-        div.appendChild(p);
+        div.appendChild(textEl);
         if (role === 'model') {
             var toggle = document.createElement('button');
             toggle.type = 'button';
@@ -137,16 +138,16 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (result.ok) {
                         userBubble.querySelector('time').textContent = result.data.user.time;
                         replyBubble.querySelector('time').textContent = result.data.reply.time;
-                        replyBubble.querySelector('p').textContent = result.data.reply.content;
+                        replyBubble.querySelector('.chat-text').innerHTML = result.data.reply.html;
                     } else {
                         replyBubble.classList.add('chat-error');
-                        replyBubble.querySelector('p').textContent = result.data.error || 'Something went wrong.';
+                        replyBubble.querySelector('.chat-text').textContent = result.data.error || 'Something went wrong.';
                     }
                 })
                 .catch(function () {
                     replyBubble.classList.remove('thinking');
                     replyBubble.classList.add('chat-error');
-                    replyBubble.querySelector('p').textContent = 'Could not reach the server.';
+                    replyBubble.querySelector('.chat-text').textContent = 'Could not reach the server.';
                 })
                 .finally(function () {
                     button.disabled = false;

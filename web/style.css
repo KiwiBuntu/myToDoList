@@ -577,11 +577,71 @@ h1 {
     margin-bottom: 0.2rem;
 }
 
-.chat-message p {
-    margin: 0;
+.chat-text {
     font-size: 0.88rem;
     white-space: pre-wrap;
     word-wrap: break-word;
+}
+
+.chat-text p {
+    margin: 0 0 0.5rem;
+}
+
+.chat-text p:last-child {
+    margin-bottom: 0;
+}
+
+.chat-text ul,
+.chat-text ol {
+    margin: 0 0 0.5rem;
+    padding-left: 1.2rem;
+}
+
+.chat-text ul:last-child,
+.chat-text ol:last-child {
+    margin-bottom: 0;
+}
+
+.chat-text code {
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 3px;
+    padding: 0.05rem 0.3rem;
+    font-size: 0.85em;
+}
+
+.chat-user .chat-text code {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.chat-text pre {
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 6px;
+    padding: 0.5rem 0.6rem;
+    margin: 0 0 0.5rem;
+    overflow-x: auto;
+}
+
+.chat-text pre:last-child {
+    margin-bottom: 0;
+}
+
+.chat-text pre code {
+    background: none;
+    padding: 0;
+    font-size: 0.82em;
+    white-space: pre;
+}
+
+.chat-text blockquote {
+    margin: 0 0 0.5rem;
+    padding-left: 0.6rem;
+    border-left: 3px solid rgba(0, 0, 0, 0.15);
+    color: inherit;
+    opacity: 0.85;
+}
+
+.chat-text blockquote:last-child {
+    margin-bottom: 0;
 }
 
 .chat-user {
@@ -600,7 +660,7 @@ h1 {
     color: var(--ink);
 }
 
-.chat-model.thinking p {
+.chat-model.thinking .chat-text {
     color: var(--muted);
     font-style: italic;
 }
@@ -610,7 +670,7 @@ h1 {
     color: var(--danger);
 }
 
-.chat-model.collapsed p {
+.chat-model.collapsed .chat-text {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
