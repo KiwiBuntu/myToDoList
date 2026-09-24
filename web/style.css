@@ -326,6 +326,11 @@ h1 {
     text-transform: none;
 }
 
+.tag-client-personal {
+    background: var(--relaxed);
+    text-transform: none;
+}
+
 .tag-priority-urgent {
     background: var(--urgent);
 }

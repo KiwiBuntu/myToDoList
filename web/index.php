@@ -144,7 +144,6 @@ $todayCount = count($reminders) - $overdueCount;
                 name="client"
                 id="client"
                 placeholder="Client (optional)"
-                class="hidden"
             >
         </div>
         <div class="add-form-row">
@@ -220,7 +219,7 @@ $todayCount = count($reminders) - $overdueCount;
                     <span class="tags">
                         <span class="tag tag-<?= htmlspecialchars($task['category']) ?>"><?= htmlspecialchars($task['category']) ?></span>
                         <?php if ($task['client']): ?>
-                            <span class="tag tag-client"><?= htmlspecialchars($task['client']) ?></span>
+                            <span class="tag <?= $task['category'] === 'personal' ? 'tag-client-personal' : 'tag-client' ?>"><?= htmlspecialchars($task['client']) ?></span>
                         <?php endif; ?>
                         <?php if ($task['priority'] !== 'normal'): ?>
                             <span class="tag tag-priority-<?= htmlspecialchars($task['priority']) ?>"><?= htmlspecialchars($task['priority']) ?></span>

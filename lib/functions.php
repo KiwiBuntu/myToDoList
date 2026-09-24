@@ -21,7 +21,7 @@ function add_task(
     if (!in_array($category, ['personal', 'work'], true)) {
         $category = 'personal';
     }
-    $client = $category === 'work' ? trim((string) $client) : '';
+    $client = trim((string) $client);
     $client = $client === '' ? null : $client;
 
     if (!in_array($priority, PRIORITIES, true)) {

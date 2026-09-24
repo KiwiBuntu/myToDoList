@@ -1,20 +1,4 @@
 document.addEventListener('DOMContentLoaded', function () {
-    var categorySelect = document.getElementById('category');
-    var clientInput = document.getElementById('client');
-
-    function syncClientField() {
-        var isWork = categorySelect.value === 'work';
-        clientInput.classList.toggle('hidden', !isWork);
-        if (!isWork) {
-            clientInput.value = '';
-        }
-    }
-
-    if (categorySelect && clientInput) {
-        categorySelect.addEventListener('change', syncClientField);
-        syncClientField();
-    }
-
     var dueInput = document.getElementById('due_at');
     var recurrenceSelect = document.getElementById('recurrence');
 
