@@ -566,7 +566,7 @@ h1 {
 
 .chat-message {
     border-radius: 8px;
-    padding: 0.3rem 0.65rem 0.5rem;
+    padding: 0.1rem 0.65rem 0.5rem;
     max-width: 90%;
 }
 
@@ -574,7 +574,8 @@ h1 {
     display: block;
     font-size: 0.68rem;
     color: var(--muted);
-    margin-bottom: 0.1rem;
+    margin-bottom: 0;
+    line-height: 1.3;
 }
 
 .chat-text {
